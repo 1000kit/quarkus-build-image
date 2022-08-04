@@ -24,5 +24,7 @@ RUN ln -s ${MAVEN_HOME}/bin/mvn /usr/bin/mvn
 
 COPY --from=samo /usr/bin/samo /usr/local/bin/samo
 
+LABEL org.opencontainers.image.source https://github.com/1000kit/quarkus-build-image
+
 USER quarkus
 
