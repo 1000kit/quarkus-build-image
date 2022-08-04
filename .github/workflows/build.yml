@@ -1,0 +1,27 @@
+name: Build and Test
+on:
+  push:
+    branches:
+      - 'v**'
+    tags-ignore:
+      - '**'
+  pull_request:
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2  
+      - name: Docker login
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Docker build
+        run: |
+          GRAALVM_VER=21.3
+          VERSION_17=$GRAALVM_VER-java17
+          IMAGE_17=ghcr.io/${{ github.repository }}:${{ github.ref_name }}-$VERSION_17
+          docker build -t $IMAGE_17 --build-arg VERSION=$VERSION_17 .
+          VERSION_11=$GRAALVM_VER-java11
+          IMAGE_11=ghcr.io/${{ github.repository }}:${{ github.ref_name }}-$VERSION_11
+          docker build -t $IMAGE_11 --build-arg VERSION=$VERSION_11 .
+          docker push $IMAGE_11
+          docker push $IMAGE_17
